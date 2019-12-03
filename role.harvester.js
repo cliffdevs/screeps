@@ -62,19 +62,19 @@ const dumpExcessEnergy = creep => {
   // repair things second
   else {
     const thingToRepair = buildActions.findNearestThingToRepair(creep);
-    if (thingToRepair) {
+    //if (thingToRepair) {
       // creep.say("repair");
-      buildActions.repairThing(creep, thingToRepair);
-    }
+      //buildActions.repairThing(creep, thingToRepair);
+    //}
 
     // upgrade things finally
-    else {
+   // else {
       if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
         creep.moveTo(creep.room.controller, {
           visualizePathStyle: { stroke: "#ffffff" }
         });
       }
-    }
+   // }
   }
   // // if empty
   if (creep.store.getFreeCapacity() === creep.store.getCapacity()) {
