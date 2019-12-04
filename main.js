@@ -62,15 +62,13 @@ module.exports.loop = function() {
     };
 
     try {
-      const maxHarvesterCount = _.filter(
-        spawner.room.creeps,
-        creep => creep.memory.role === "maxharvester"
-      ).length;
+      const maxHarvesterCount = _.filter(spawner.room.creeps, creep => {
+        return creep.memory.role === "maxharvester";
+      }).length;
 
-      const courierCount = _.filter(
-        spawner.room.creeps,
-        creep => creep.memory.role === "courier"
-      ).length;
+      const courierCount = _.filter(spawner.room.creeps, creep => {
+        return creep.memory.role === "courier";
+      }).length;
 
       if (maxHarvesterCount === 0 || courierCount === 0) {
         harvesterSpawner.spawn(spawnerInput);
