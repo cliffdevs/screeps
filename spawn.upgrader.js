@@ -11,12 +11,12 @@ const PARTS = [
   CARRY,
   CARRY,
   CARRY,
-  CARRY,
-  CARRY,
-  CARRY,
-  CARRY,
-  CARRY,
-  CARRY,
+  MOVE,
+  MOVE,
+  MOVE,
+  MOVE,
+  MOVE,
+  MOVE,
   MOVE,
   MOVE
 ];
