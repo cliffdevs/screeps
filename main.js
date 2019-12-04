@@ -76,8 +76,9 @@ module.exports.loop = function() {
         harvesterSpawner.spawn(spawnerInput);
       }
 
-      maxharvesterSpawner.spawn(spawnerInput);
-
+      if (courierCount >= 2 * maxHarvesterCount) {
+        maxharvesterSpawner.spawn(spawnerInput);
+      }
       if (maxHarvesterCount > 0) {
         courierSpawner.spawn(spawnerInput);
       }
@@ -101,6 +102,7 @@ module.exports.loop = function() {
       // todo find closest spawn from attack / claim flag
       if (
         Game.flags["Attack"] &&
+        Game.flags["Attack"].room &&
         (Game.flags["Attack"].room.find(FIND_HOSTILE_CREEPS).length > 0 ||
           Game.flags["Attack"].room.find(FIND_HOSTILE_SPAWNS).length > 0)
       ) {
@@ -109,6 +111,7 @@ module.exports.loop = function() {
 
       if (
         Game.flags["Claim"] &&
+        Game.flags["Claim"].room &&
         Game.flags["Claim"].room.find(FIND_HOSTILE_STRUCTURES, {
           filter: struct => struct.structureType === STRUCTURE_CONTROLLER
         })

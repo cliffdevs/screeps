@@ -1,6 +1,6 @@
 const spawner = require("spawner");
 
-const MAX_UNITS = 4;
+const MAX_UNITS = 6;
 const PARTS = [
   MOVE,
   MOVE,
