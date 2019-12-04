@@ -9,8 +9,14 @@ const PARTS = [
   WORK,
   CARRY,
   CARRY,
-  MOVE,
-  MOVE,
+  CARRY,
+  CARRY,
+  CARRY,
+  CARRY,
+  CARRY,
+  CARRY,
+  CARRY,
+  CARRY,
   MOVE,
   MOVE
 ];

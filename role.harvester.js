@@ -61,19 +61,18 @@ const dumpExcessEnergy = creep => {
   }
   // repair things second
   else {
-    const thingToRepair = buildActions.findNearestThingToRepair(creep);
-    if (thingToRepair) {
-      // creep.say("repair");
-      buildActions.repairThing(creep, thingToRepair);
-    }
-
-    // upgrade things finally
-    else {
-      if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-        creep.moveTo(creep.room.controller, {
-          visualizePathStyle: { stroke: "#ffffff" }
-        });
-      }
+    // const thingToRepair = buildActions.findNearestThingToRepair(creep);
+    // if (thingToRepair) {
+    //   // creep.say("repair");
+    //   buildActions.repairThing(creep, thingToRepair);
+    // }
+    const towerNeedingFuel = locateNearestTowerNeedingFuel(creep);
+    if (towerNeedingFuel) {
+      deliverEnergyToTarget(creep, towerNeedingFuel);
+    } else if (
+      creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE
+    ) {
+      creepNavigator.moveCreepTo(creep, creep.room.controller.pos);
     }
   }
   // // if empty
@@ -89,6 +88,12 @@ const roleHarvester = {
       mineRefueler.run(creep);
     } else {
       creep.memory.delivering = true;
+
+      const dropped = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
+      if (dropped && creep.pickup(dropped) == ERR_NOT_IN_RANGE) {
+        creepNavigator.moveCreepTo(creep, dropped);
+      }
+
       const targets = findEnergyStorageLocations(creep);
       if (targets.length > 0) {
         deliverEnergyToTarget(creep, targets[0]);

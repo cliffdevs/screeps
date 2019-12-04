@@ -1,15 +1,42 @@
 const roleHarvester = require("role.harvester");
+const roleMaxHarvester = require("role.maxharvester");
 const roleUpgrader = require("role.upgrader");
 const roleBuilder = require("role.builder");
+const roleAttacker = require("role.attacker");
+const roleClaimer = require("role.claimer");
+const roleRecycler = require("role.recycler");
+const roleCourier = require("role.courier");
 const builderSpawner = require("spawn.builder");
+const harvesterSpawner = require("spawn.harvester");
 const maxharvesterSpawner = require("spawn.maxharvester");
 const upgraderSpawner = require("spawn.upgrader");
+const attackerSpawner = require("spawn.attacker");
+const claimerSpawner = require("spawn.claimer");
+const courierSpawner = require("spawn.courier");
 const creepCleaner = require("memory.creepcleaner");
 const towerManager = require("towers");
 const locationUtils = require("utils.locate");
 
 module.exports.loop = function() {
   creepCleaner.purge();
+
+  _.filter(
+    Game.creeps,
+    creep =>
+      creep.memory.role === "claimer" ||
+      creep.memory.role === "attacker" ||
+      creep.memory.role === "recycler"
+  ).forEach(creep => {
+    if (creep.memory.role === "attacker") {
+      roleAttacker.run(creep);
+    }
+    if (creep.memory.role === "claimer") {
+      roleClaimer.run(creep);
+    }
+    if (creep.memory.role === "recycler") {
+      roleRecycler.run(creep);
+    }
+  });
 
   for (var spawnerName in Game.spawns) {
     const spawner = Game.spawns[spawnerName];
@@ -35,11 +62,58 @@ module.exports.loop = function() {
     };
 
     try {
-      maxharvesterSpawner.spawn(spawnerInput);
-      upgraderSpawner.spawn(spawnerInput);
+      const maxHarvesterCount = _.filter(
+        spawner.room.creeps,
+        creep => creep.memory.role === "maxharvester"
+      ).length;
 
-      if (locationUtils.findThingsToBuild(spawner.room).length > 0) {
+      const courierCount = _.filter(
+        spawner.room.creeps,
+        creep => creep.memory.role === "courier"
+      ).length;
+
+      if (maxHarvesterCount === 0 || courierCount === 0) {
+        harvesterSpawner.spawn(spawnerInput);
+      }
+
+      maxharvesterSpawner.spawn(spawnerInput);
+
+      if (maxHarvesterCount > 0) {
+        courierSpawner.spawn(spawnerInput);
+      }
+      // // if container energy > 0
+      const containersWithEnergy = spawner.room.find(FIND_STRUCTURES, {
+        filter: struct =>
+          struct.structureType === STRUCTURE_CONTAINER &&
+          struct.store[RESOURCE_ENERGY] > 0
+      });
+      if (containersWithEnergy > 0) {
+        upgraderSpawner.spawn(spawnerInput);
+      }
+
+      if (
+        locationUtils.findThingsToBuild(spawner.room).length > 0 &&
+        containersWithEnergy > 0
+      ) {
         builderSpawner.spawn(spawnerInput);
+      }
+
+      // todo find closest spawn from attack / claim flag
+      if (
+        Game.flags["Attack"] &&
+        (Game.flags["Attack"].room.find(FIND_HOSTILE_CREEPS).length > 0 ||
+          Game.flags["Attack"].room.find(FIND_HOSTILE_SPAWNS).length > 0)
+      ) {
+        attackerSpawner.spawn(spawnerInput);
+      }
+
+      if (
+        Game.flags["Claim"] &&
+        Game.flags["Claim"].room.find(FIND_HOSTILE_STRUCTURES, {
+          filter: struct => struct.structureType === STRUCTURE_CONTROLLER
+        })
+      ) {
+        claimerSpawner.spawn(spawnerInput);
       }
     } catch (error) {
       console.log(error.message);
@@ -59,11 +133,17 @@ module.exports.loop = function() {
       if (creep.memory.role == "harvester") {
         roleHarvester.run(creep);
       }
+      if (creep.memory.role == "maxharvester") {
+        roleMaxHarvester.run(creep);
+      }
       if (creep.memory.role == "upgrader") {
         roleUpgrader.run(creep);
       }
       if (creep.memory.role == "builder") {
         roleBuilder.run(creep);
+      }
+      if (creep.memory.role == "courier") {
+        roleCourier.run(creep);
       }
     });
 
