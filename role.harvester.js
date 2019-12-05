@@ -74,6 +74,7 @@ const dumpExcessEnergy = creep => {
     ) {
       creepNavigator.moveCreepTo(creep, creep.room.controller.pos);
     }
+
   }
   // // if empty
   if (creep.store.getFreeCapacity() === creep.store.getCapacity()) {
