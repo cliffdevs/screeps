@@ -32,8 +32,9 @@ const spawn = ({
     );
 
     if (spawnResult == OK) {
-      Memory[roomName] = Memory[roomName] || {};
-      Memory[roomName].previousSpawnEnergySource = energySource;
+      Memory.rooms = Memory.rooms || {};
+      Memory.rooms[roomName] = Memory.rooms[roomName] || {};
+      Memory.rooms[roomName].previousSpawnEnergySource = energySource;
     } else
       throw Error(
         "Unable to spawn a new " + role + " right now: " + spawnResult

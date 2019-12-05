@@ -8,7 +8,11 @@ const run = creep => {
   const flag = Game.flags["Claim"];
   if (flag) {
     if (creep) {
-      creep.say(creep.room.name);
+      Memory.rooms = Memory.rooms ? Memory.rooms : {};
+      Memory.rooms[flag.pos.roomName] = Memory.rooms[flag.pos.roomName]
+        ? Memory.rooms[flag.pos.roomName]
+        : {};
+      Memory.rooms[flag.pos.roomName].claimer = creep.name;
       if (creep.room.name === flag.pos.roomName) {
         const controller = Game.rooms[flag.pos.roomName].find(FIND_STRUCTURES, {
           filter: struct => struct.structureType === STRUCTURE_CONTROLLER
@@ -23,6 +27,9 @@ const run = creep => {
           }
         } else if (result != OK) {
           console.log("attack controller failed because " + result);
+        } else if (result == OK) {
+          creep.say("success");
+          console.log("ATTACK SUCCEEDED");
         }
       } else {
         creep.say("deploy");

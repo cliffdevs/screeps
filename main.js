@@ -16,6 +16,7 @@ const courierSpawner = require("spawn.courier");
 const creepCleaner = require("memory.creepcleaner");
 const towerManager = require("towers");
 const locationUtils = require("utils.locate");
+const creepUtils = require("util.creeps");
 
 module.exports.loop = function() {
   creepCleaner.purge();
@@ -44,8 +45,10 @@ module.exports.loop = function() {
       "Now updating area for spawner " + spawnerName + ":" + spawner.id
     );
 
+    Memory.rooms = Memory.rooms || {};
+    Memory.rooms[spawner.room.name] = Memory.rooms[spawner.room.name] || {};
     const previousSourceId =
-      Memory[spawner.room.name].previousSpawnEnergySource;
+      Memory.rooms[spawner.room.name].previousSpawnEnergySource;
     const sourcesNotPrevious = spawner.room.find(FIND_SOURCES, {
       filter: source => {
         return source.id !== previousSourceId;
@@ -62,13 +65,28 @@ module.exports.loop = function() {
     };
 
     try {
-      const maxHarvesterCount = _.filter(spawner.room.creeps, creep => {
-        return creep.memory.role === "maxharvester";
+      const creepsInRoom = creepUtils.getCreepsByRoomName(spawner.room.name);
+
+      const maxHarvesterCount = _.filter(
+        creepsInRoom,
+        creep => creep.memory.role === "maxharvester"
+      ).length;
+
+      const courierCount = _.filter(
+        creepsInRoom,
+        creep => creep.memory.role === "courier"
+      ).length;
+
+      const containersWithEnergy = spawner.room.find(FIND_STRUCTURES, {
+        filter: struct =>
+          struct.structureType === STRUCTURE_CONTAINER &&
+          struct.store[RESOURCE_ENERGY] > 0
       }).length;
 
-      const courierCount = _.filter(spawner.room.creeps, creep => {
-        return creep.memory.role === "courier";
-      }).length;
+      const attackersCount = _.filter(
+        creepsInRoom,
+        creep => creep.memory.role === "attacker"
+      ).length;
 
       if (maxHarvesterCount === 0 || courierCount === 0) {
         harvesterSpawner.spawn(spawnerInput);
@@ -80,12 +98,7 @@ module.exports.loop = function() {
       if (maxHarvesterCount > 0) {
         courierSpawner.spawn(spawnerInput);
       }
-      // // if container energy > 0
-      const containersWithEnergy = spawner.room.find(FIND_STRUCTURES, {
-        filter: struct =>
-          struct.structureType === STRUCTURE_CONTAINER &&
-          struct.store[RESOURCE_ENERGY] > 0
-      });
+
       if (containersWithEnergy > 0) {
         upgraderSpawner.spawn(spawnerInput);
       }
@@ -98,26 +111,29 @@ module.exports.loop = function() {
       }
 
       // todo find closest spawn from attack / claim flag
-      if (
-        Game.flags["Attack"] &&
-        Game.flags["Attack"].room &&
-        (Game.flags["Attack"].room.find(FIND_HOSTILE_CREEPS).length > 0 ||
-          Game.flags["Attack"].room.find(FIND_HOSTILE_SPAWNS).length > 0)
-      ) {
-        attackerSpawner.spawn(spawnerInput);
-      }
+      // if (Game.flags["Attack"]) {
+      //   Memory.rooms = Memory.rooms ? Memory.rooms : {};
+      //   Memory.rooms[flag.pos.roomName] = Memory.rooms[flag.pos.roomName]
+      //     ? Memory.rooms[flag.pos.roomName]
+      //     : {};
+      //   Memory.rooms[flag.pos.roomName].attackers =
+      //     Memory.rooms[flag.pos.roomName].attackers || [];
+      //   if (Memory.rooms[flag.pos.roomName].attackers.length < 10) {
+      //     attackerSpawner.spawn(spawnerInput);
+      //   }
+      // }
 
       if (
         Game.flags["Claim"] &&
-        Game.flags["Claim"].room &&
-        Game.flags["Claim"].room.find(FIND_HOSTILE_STRUCTURES, {
-          filter: struct => struct.structureType === STRUCTURE_CONTROLLER
-        })
+        (!Memory.rooms ||
+          !Memory.rooms[Game.flags["Claim"].pos.roomName] ||
+          !Memory.rooms[Game.flags["Claim"].pos.roomName].claimer)
       ) {
+        console.log("spawning claimer...");
         claimerSpawner.spawn(spawnerInput);
       }
     } catch (error) {
-      console.log(error.message);
+      console.log(error);
     }
 
     if (spawner.spawning) {
