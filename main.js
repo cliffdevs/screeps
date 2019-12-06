@@ -111,17 +111,17 @@ module.exports.loop = function() {
       }
 
       // todo find closest spawn from attack / claim flag
-      // if (Game.flags["Attack"]) {
-      //   Memory.rooms = Memory.rooms ? Memory.rooms : {};
-      //   Memory.rooms[flag.pos.roomName] = Memory.rooms[flag.pos.roomName]
-      //     ? Memory.rooms[flag.pos.roomName]
-      //     : {};
-      //   Memory.rooms[flag.pos.roomName].attackers =
-      //     Memory.rooms[flag.pos.roomName].attackers || [];
-      //   if (Memory.rooms[flag.pos.roomName].attackers.length < 10) {
-      //     attackerSpawner.spawn(spawnerInput);
-      //   }
-      // }
+      if (Game.flags["Attack"]) {
+        Memory.rooms = Memory.rooms ? Memory.rooms : {};
+        Memory.rooms[Game.flags["Attack"].pos.roomName] = Memory.rooms[Game.flags["Attack"].pos.roomName]
+          ? Memory.rooms[Game.flags["Attack"].pos.roomName]
+          : {};
+        Memory.rooms[Game.flags["Attack"].pos.roomName].attackers =
+          Memory.rooms[Game.flags["Attack"].pos.roomName].attackers || [];
+        if (Memory.rooms[Game.flags["Attack"].pos.roomName].attackers.length < 10) {
+          attackerSpawner.spawn(spawnerInput);
+        }
+      }
 
       if (
         Game.flags["Claim"] &&
