@@ -25,6 +25,9 @@ const run = creep => {
           if (moveResult != OK) {
             console.log("attack move failed because " + moveResult);
           }
+        } else if (result == ERR_INVALID_TARGET) {
+          creep.claimController(controller);
+          creep.reserveController(controller);
         } else if (result != OK) {
           console.log("attack controller failed because " + result);
         } else if (result == OK) {

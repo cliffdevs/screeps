@@ -1,5 +1,6 @@
 const roleHarvester = require("role.harvester");
 const roleMaxHarvester = require("role.maxharvester");
+const roleRemoteMiner = require("role.remoteminer");
 const roleUpgrader = require("role.upgrader");
 const roleBuilder = require("role.builder");
 const roleAttacker = require("role.attacker");
@@ -10,6 +11,7 @@ const builderSpawner = require("spawn.builder");
 const harvesterSpawner = require("spawn.harvester");
 const maxharvesterSpawner = require("spawn.maxharvester");
 const upgraderSpawner = require("spawn.upgrader");
+const remoteMinerSpawner = require("spawn.remoteminer");
 const attackerSpawner = require("spawn.attacker");
 const claimerSpawner = require("spawn.claimer");
 const courierSpawner = require("spawn.courier");
@@ -131,6 +133,18 @@ module.exports.loop = function() {
       ) {
         console.log("spawning claimer...");
         claimerSpawner.spawn(spawnerInput);
+      }
+
+      if (Game.flags["Mine"]) {
+        Memory.rooms = Memory.rooms ? Memory.rooms : {};
+        Memory.rooms[Game.flags["Mine"].pos.roomName] = Memory.rooms[Game.flags["Mine"].pos.roomName]
+          ? Memory.rooms[Game.flags["Mine"].pos.roomName]
+          : {};
+        Memory.rooms[Game.flags["Mine"].pos.roomName].miners =
+          Memory.rooms[Game.flags["Mine"].pos.roomName].miners || [];
+        if (Memory.rooms[Game.flags["Mine"].pos.roomName].miners.length < 10) {
+          remoteMinerSpawner.spawn(spawnerInput);
+        }
       }
     } catch (error) {
       console.log(error);

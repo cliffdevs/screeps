@@ -51,34 +51,37 @@ const deliverEnergyToTarget = (creep, target) => {
 };
 
 const dumpExcessEnergy = creep => {
-  creep.say("excess");
-  console.log(creep.name + " has excess energy");
-  // build things first
-  const site = buildActions.findNearestConstructionSite(creep);
-  if (site) {
-    // creep.say("build");
-    buildActions.constructTarget(creep, site);
-  }
-  // repair things second
-  else {
-    // const thingToRepair = buildActions.findNearestThingToRepair(creep);
-    // if (thingToRepair) {
-    //   // creep.say("repair");
-    //   buildActions.repairThing(creep, thingToRepair);
-    // }
-    const towerNeedingFuel = locateNearestTowerNeedingFuel(creep);
-    if (towerNeedingFuel) {
-      deliverEnergyToTarget(creep, towerNeedingFuel);
-    } else if (
-      creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE
-    ) {
-      creepNavigator.moveCreepTo(creep, creep.room.controller.pos);
+  if (creep.room.name === creep.memory.spawn) {
+    creep.say("excess");
+    console.log(creep.name + " has excess energy");
+    // build things first
+    const site = buildActions.findNearestConstructionSite(creep);
+    if (site) {
+      // creep.say("build");
+      buildActions.constructTarget(creep, site);
     }
-
-  }
-  // // if empty
-  if (creep.store.getFreeCapacity() === creep.store.getCapacity()) {
-    creep.memory.delivering = false;
+    // repair things second
+    else {
+      // const thingToRepair = buildActions.findNearestThingToRepair(creep);
+      // if (thingToRepair) {
+      //   // creep.say("repair");
+      //   buildActions.repairThing(creep, thingToRepair);
+      // }
+      const towerNeedingFuel = locateNearestTowerNeedingFuel(creep);
+      if (towerNeedingFuel) {
+        deliverEnergyToTarget(creep, towerNeedingFuel);
+      } else if (
+        creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE
+      ) {
+        creepNavigator.moveCreepTo(creep, creep.room.controller.pos);
+      }
+    }
+    // // if empty
+    if (creep.store.getFreeCapacity() === creep.store.getCapacity()) {
+      creep.memory.delivering = false;
+    }
+  } else {
+    creep.moveTo(Game.spawns[creep.memory.spawn]);
   }
 };
 
