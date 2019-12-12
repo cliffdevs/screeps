@@ -36,9 +36,16 @@ const getFakeRoom = (name, opts) => {
   return room;
 };
 
+class Room {
+  constructor() {
+
+  }
+}
+
 module.exports = {
-    Game,
-    Memory,
-    getFakeCreep,
-    getFakeRoom
+  Game,
+  Memory,
+  Room,
+  getFakeCreep,
+  getFakeRoom
 }

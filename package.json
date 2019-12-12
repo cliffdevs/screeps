@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "test": "mocha test/unit/*.spec.js"
+    "test": "mocha test/unit/**/*.spec.js"
   },
   "dependencies": {},
   "devDependencies": {
