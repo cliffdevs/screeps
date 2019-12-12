@@ -1,10 +1,9 @@
-import { MemoryCleaner } from "./utils/memory-cleaner";
+const { MemoryCleaner } = require("./util/memory-cleaner");
 
 /**
  * All AI Logic starts here.
  */
-export class Brain {
-  memoryCleaner;
+class Brain {
 
   /**
    * Conscuctor for Brain
@@ -42,4 +41,8 @@ export class Brain {
 
     return true;
   }
+}
+
+module.exports = {
+  Brain
 }
