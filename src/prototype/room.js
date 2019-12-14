@@ -1,17 +1,17 @@
 const REFRESH_INTERVAL = 100;
 
-const findImportantStructures = () => {
+const findImportantStructures = (roomName) => {
     Memory.rooms = Memory.rooms || {};
-    Memory.rooms[this.name] = Memory.rooms[this.name] || {};
-    if (!Memory.rooms[this.name].importantStructures) {
-        Memory.rooms[this.name].importantStructures = {};
-        Memory.rooms[this.name].importantStructures.energySources = {};
-        this.find(FIND_SOURCES).forEach(source => {
-            Memory.rooms[this.name].importantStructures.energySources[source.id] = {};
-        })
+    Memory.rooms[roomName] = Memory.rooms[roomName] || {};
+    if (!Memory.rooms[roomName].importantStructures) {
+        Memory.rooms[roomName].importantStructures = {};
+        Memory.rooms[roomName].importantStructures.energySources = {};
+        Game.rooms[roomName].find(FIND_SOURCES).forEach(source => {
+            Memory.rooms[roomName].importantStructures.energySources[source.id] = {};
+        });
     }
 }
 
-Room.prototype.execute = () => {
-    findImportantStructures();
+Room.prototype.execute = function () {
+    findImportantStructures(this.name);
 }

@@ -1,35 +1,32 @@
 const { expect } = require("chai");
 const { Game, Memory, Room } = require("../mock");
-const { stub } = require("sinon");
+const sinon = require("sinon");
 const _ = require("lodash");
 
 describe("room", () => {
-    let room;
 
     beforeEach(() => {
         global.Game = _.clone(Game);
         global.Memory = _.clone(Memory);
+        global.FIND_SOURCES = 123;
         global.Room = Room;
         require("../../../src/prototype/room");
-        room = new Room();
-        room.name = 'E18S34';
-    })
+    });
 
     it("should have an execute method", () => {
+        const room = new Room();
         expect(room.execute).to.be.a("function");
     });
 
     it("should store important structures in room memory", () => {
         const source1 = { id: '12345' };
         const source2 = { id: '54321' };
-
-        const find = stub();
-        find.returns([
+        sinon.replace(global.Room.prototype, 'find', () => ([
             source1,
             source2
-        ]);
-        global.Room.prototype.find = find;
-
+        ]));
+        const room = new Room('E18S34');
+        global.Game.rooms[room.name] = room;
         room.execute();
 
         expect(global.Memory.rooms[room.name].importantStructures.energySources[source1.id]).to.be.an("object");

@@ -1,3 +1,5 @@
+"use strict"
+
 const { stub } = require("sinon");
 
 const Game = {
@@ -37,8 +39,21 @@ const getFakeRoom = (name, opts) => {
 };
 
 class Room {
-  constructor() {
 
+  constructor(name) {
+    this._name = name;
+  }
+
+  get name() {
+    return this._name;
+  }
+
+  set name(newName) {
+    this._name = newName;
+  }
+
+  find() {
+    return [];
   }
 }
 
